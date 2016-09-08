@@ -21,3 +21,7 @@ class User:
         else:
             self.connectionFailed.append(datetime.now)
             return False
+
+    def add_connection(self,ip,browser):
+        self.IPAddressUsed.append(ip)
+        self.browserUsed.append(browser)

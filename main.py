@@ -1,9 +1,9 @@
 from flask import Flask, render_template,request,redirect,url_for
-from user import User
+from authenticationService import AuthenticationService
+
 """Definition of the global variables"""
 app = Flask(__name__)
-maxSecurityLevel = 4
-users = [User("azer", "azer","azer2"), User("hadrien", "h","h2")]
+service = AuthenticationService()
 
 #Index page route
 @app.route("/", methods=["GET", "POST"])
@@ -26,7 +26,7 @@ def check_user(uName,httpUserAgent,ip):
     browserFound = False
     #go trhough the registered users and check if user exists
     #Then evaluate the risks
-    for u in users:
+    for u in service.users:
         if u.name == uName:
             userKnown = True
             for ipa in u.IPAddressUsed:
@@ -43,18 +43,20 @@ def check_user(uName,httpUserAgent,ip):
     if userKnown:
         return securityLevel
     else:
-        return maxSecurityLevel
+        return service.maxSecurityLevel
 
 def redirect_login(uName, securityLevel):
     print "Security level = ",securityLevel
-    if securityLevel < maxSecurityLevel:
+    if securityLevel < service.maxSecurityLevel:
         #sent in GET => easily avoided => need POST
         return redirect(url_for("login", sl=securityLevel, name=uName))
 
     else:
         return redirect(url_for("denied"))
 
-
+"""login is the auth service
+it checks using User class if the credential are correct
+it adds a new connection """
 @app.route("/login",methods=["GET","POST"])
 def login():
     if request.method == "GET":
@@ -66,12 +68,23 @@ def login():
             params = {"name":request.args['name'], "pwd2":"True","sms":"True", "SecurityLevel":request.args['sl']}
         return render_template("login.html", param=params)
     elif request.method == "POST":
-        print "TODO"
         #check the credential
-        #add the environment variable to the user if success
+        for u in service.users:
+            if u.name == request.form['name']:
+                if u.new_connection(request.form['name'], request.form['pwd']):
+                    #add the environment variable to the user if success
+                    u.add_connection( request.remote_addr, request.user_agent)
+                    return redirect(url_for("checkLogs"))
+                else:
+                    service.failedConnection += 1
+                    return redirect(url_for("home"))
     else:
         return redirect(url_for("home"))
 
+
+@app.route('/logs', methods=["GET", "POST"])
+def checkLogs():
+    return render_template("logs.html",failed=service.failedConnection)
 
 @app.route('/denied', methods=["GET", "POST"])
 def denied():
