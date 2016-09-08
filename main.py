@@ -12,38 +12,10 @@ def home():
         return render_template("index.html")
     else:
         #Check informations about the requesting agent
-        sLevel = check_user(request.form["name"], request.user_agent, request.remote_addr)
+        sLevel = service.eval_user_risk(request.form["name"], request.user_agent, request.remote_addr)
         #And send to the appropriate login page
         return redirect_login(request.form["name"],sLevel)
 
-"""Check user represent the RiskEval service
-It will check if the user, its IP and browser are known
-Return an int that match the security (0 light, 4 demands high security)"""
-def check_user(uName,httpUserAgent,ip):
-    securityLevel = 0
-    userKnown=False
-    ipFound = False
-    browserFound = False
-    #go trhough the registered users and check if user exists
-    #Then evaluate the risks
-    for u in service.users:
-        if u.name == uName:
-            userKnown = True
-            for ipa in u.IPAddressUsed:
-                if ipa == ip:
-                    ipFound=True
-            if not ipFound:
-                securityLevel +=1
-
-            for b in u.browserUsed:
-                if b == httpUserAgent:
-                    browserFound = True
-            if not browserFound:
-                securityLevel+=1
-    if userKnown:
-        return securityLevel
-    else:
-        return service.maxSecurityLevel
 
 def redirect_login(uName, securityLevel):
     print "Security level = ",securityLevel
@@ -54,9 +26,7 @@ def redirect_login(uName, securityLevel):
     else:
         return redirect(url_for("denied"))
 
-"""login is the auth service
-it checks using User class if the credential are correct
-it adds a new connection """
+
 @app.route("/login",methods=["GET","POST"])
 def login():
     if request.method == "GET":
@@ -68,16 +38,10 @@ def login():
             params = {"name":request.args['name'], "pwd2":"True","sms":"True", "SecurityLevel":request.args['sl']}
         return render_template("login.html", param=params)
     elif request.method == "POST":
-        #check the credential
-        for u in service.users:
-            if u.name == request.form['name']:
-                if u.new_connection(request.form['name'], request.form['pwd']):
-                    #add the environment variable to the user if success
-                    u.add_connection( request.remote_addr, request.user_agent)
-                    return redirect(url_for("checkLogs"))
-                else:
-                    service.failedConnection += 1
-                    return redirect(url_for("home"))
+        if service.authentication_service(request):
+            return redirect(url_for("checkLogs"))
+        else:
+            return redirect(url_for("home"))
     else:
         return redirect(url_for("home"))
 
