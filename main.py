@@ -12,7 +12,7 @@ def home():
         return render_template("index.html")
     else:
         #Check informations about the requesting agent
-        sLevel = check_user(request.form["name"], request.environ['HTTP_USER_AGENT'], request.remote_addr)
+        sLevel = check_user(request.form["name"], request.user_agent, request.remote_addr)
         #And send to the appropriate login page
         return redirect_login(request.form["name"],sLevel)
 
