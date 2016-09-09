@@ -12,7 +12,7 @@ def home():
         return render_template("index.html")
     else:
         #Check informations about the requesting agent
-        sLevel = service.eval_user_risk(request.form["name"], request.user_agent, request.remote_addr)
+        sLevel = service.eval_user_risk(request)
         #And send to the appropriate login page
         return redirect_login(request.form["name"],sLevel)
 

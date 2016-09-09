@@ -23,5 +23,16 @@ class User:
             return False
 
     def add_connection(self,ip,browser):
-        self.IPAddressUsed.append(ip)
-        self.browserUsed.append(browser)
+        ipFound = False
+        bFound = False
+        for v in self.IPAddressUsed:
+            if v == ip:
+                ipFound=True
+        if not ipFound:
+            self.IPAddressUsed.append(ip)
+
+        for v in self.browserUsed:
+            if v == browser:
+                bFound=True
+        if not bFound:
+            self.browserUsed.append(str(browser))
