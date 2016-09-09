@@ -31,13 +31,15 @@ def redirect_login(uName, securityLevel):
 def login():
     if request.method == "GET":
         if int(request.args['sl']) == 0:
-            params = {"name":request.args['name'],"pwd2":"False","sms":"False","SecurityLevel":request.args['sl']}
+            params = {"name":request.args['name'],"pwd2":"False","sms":"False","securityLevel":request.args['sl']}
         elif int(request.args['sl']) == 1 or int(request.args['sl']) == 2:
-            params = {"name":request.args['name'], "pwd2":"True","sms":"False", "SecurityLevel":request.args['sl']}
+            params = {"name":request.args['name'], "pwd2":"True","sms":"False", "securityLevel":request.args['sl']}
         else:
-            params = {"name":request.args['name'], "pwd2":"True","sms":"True", "SecurityLevel":request.args['sl']}
+            params = {"name":request.args['name'], "pwd2":"True","sms":"True", "securityLevel":request.args['sl']}
         return render_template("login.html", param=params)
+
     elif request.method == "POST":
+        print "la"
         if service.authentication_service(request):
             return redirect(url_for("checkLogs"))
         else:

@@ -14,8 +14,16 @@ class User:
     """Method called for a new connection
     Return True if the credential are correct False otherwise
     Add new entry in the connection recap"""
-    def new_connection(self,name,pwd):
+    def light_connection(self,name,pwd):
         if self.name==name and self.pwd==pwd:
+            self.connectionSuccess.append(datetime.now)
+            return True
+        else:
+            self.connectionFailed.append(datetime.now)
+            return False
+
+    def medium_connection(self,name,pwd,pwd2):
+        if self.name==name and self.pwd==pwd and self.pwd2==pwd2:
             self.connectionSuccess.append(datetime.now)
             return True
         else:

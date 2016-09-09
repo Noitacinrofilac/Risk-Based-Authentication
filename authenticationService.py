@@ -41,10 +41,16 @@ class AuthenticationService:
     def authentication_service(self, request):
         for u in self.users:
             if u.name == request.form['name']:
-                if u.new_connection(request.form['name'], request.form['pwd']):
-                    #add the environment variable to the user if success
-                    u.add_connection( request.remote_addr, request.user_agent)
-                    return True
+                if int(request.form['sl']) < 2:
+                    if u.light_connection(request.form['name'], request.form['pwd']):
+                        #add the environment variable to the user if success
+                        u.add_connection( request.remote_addr, request.user_agent)
+                        return True
+                else:
+                    if u.medium_connection(request.form['name'], request.form['pwd'], request.form['pwd2']):
+                        #add the environment variable to the user if success
+                        u.add_connection( request.remote_addr, request.user_agent)
+                        return True
         #User not found
         #Or wrong credential
         self.failedConnection += 1
