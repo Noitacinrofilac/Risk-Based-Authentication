@@ -9,7 +9,7 @@ class AuthenticationService:
     """Represent the RiskEval service
     It will check if the user, its IP and browser are known
     Return an int that match the security (0 light, 4 demands high security)"""
-    def eval_user_risk(self, request): #uName, httpUserAgent, ip):
+    def eval_user_risk(self, uName, user_agent, remote_addr):
         securityLevel = 0
         userKnown = False
         ipFound = False
@@ -17,16 +17,16 @@ class AuthenticationService:
         # go trhough the registered users and check if user exists
         # Then evaluate the risks
         for u in self.users:
-            if u.name == request.form["name"]:
+            if u.name == uName:
                 userKnown = True
                 for ipa in u.IPAddressUsed:
-                    if ipa == request.remote_addr:
+                    if ipa == remote_addr:
                         ipFound = True
                 if not ipFound:
                     securityLevel += 1
 
                 for b in u.browserUsed:
-                    if b == str(request.user_agent):
+                    if b == str(user_agent):
                         browserFound = True
                 if not browserFound:
                     securityLevel += 1
@@ -44,12 +44,12 @@ class AuthenticationService:
                 if int(request.form['sl']) < 2:
                     if u.light_connection(request.form['name'], request.form['pwd']):
                         #add the environment variable to the user if success
-                        u.add_connection( request.remote_addr, request.user_agent)
+                        u.add_connection(request.remote_addr, request.user_agent)
                         return True
-                else:
+                elif int(request.form['sl']) < self.maxSecurityLevel:
                     if u.medium_connection(request.form['name'], request.form['pwd'], request.form['pwd2']):
                         #add the environment variable to the user if success
-                        u.add_connection( request.remote_addr, request.user_agent)
+                        u.add_connection(request.remote_addr, request.user_agent)
                         return True
         #User not found
         #Or wrong credential

@@ -12,7 +12,7 @@ def home():
         return render_template("index.html")
     else:
         #Check informations about the requesting agent
-        sLevel = service.eval_user_risk(request)
+        sLevel = service.eval_user_risk(request.form['name'],request.user_agent,request.remote_addr)
         #And send to the appropriate login page
         return redirect_login(request.form["name"],sLevel)
 
@@ -39,7 +39,6 @@ def login():
         return render_template("login.html", param=params)
 
     elif request.method == "POST":
-        print "la"
         if service.authentication_service(request):
             return redirect(url_for("checkLogs"))
         else:
@@ -50,7 +49,10 @@ def login():
 
 @app.route('/logs', methods=["GET", "POST"])
 def checkLogs():
-    return render_template("logs.html",failed=service.failedConnection)
+    if request.args:
+        # retrieve the information asked
+        print "logs = ..."
+    return render_template("logs.html", failed=service.failedConnection)
 
 @app.route('/denied', methods=["GET", "POST"])
 def denied():
