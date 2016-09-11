@@ -1,7 +1,7 @@
 import unittest
 from authenticationService import AuthenticationService
 
-
+"""Class used to represent a fake request"""
 class Request():
     def __init__(self,sl,name,p1,p2):
         self.form={'sl':sl,'name':name,'pwd':p1,'pwd2':p2}
@@ -15,8 +15,9 @@ class AuthServiceTest(unittest.TestCase):
         self.service.users[1].IPAddressUsed.append("192.168.1.5")
         self.service.users[1].browserUsed.append("firefox")
 
+    """Test of the auth service method
+        Using different security levels 0-1, 2-3, >3"""
     def test_authenticationService(self):
-        #Tests for different security levels 0-1, 2-3, >3
         #0-1
         sl = 0
         self.assertEqual(self.service.failedConnection,0)
@@ -78,7 +79,7 @@ class AuthServiceTest(unittest.TestCase):
         self.assertEqual(len(self.service.users[1].connectionFailed), 3)
         self.assertFalse(self.service.authentication_service(Request(sl, 'hadrien', 'h', "h2")))
 
-
+    """Test the risk evaluation service"""
     def test_evalUserRisk(self):
         self.assertEqual(self.service.eval_user_risk("hadrien","firefox","192.168.1.5"),0)
 

@@ -5,7 +5,8 @@ from authenticationService import AuthenticationService
 app = Flask(__name__)
 service = AuthenticationService()
 
-#Index page route
+"""Home page
+    The user write its name to access the login page"""
 @app.route("/", methods=["GET", "POST"])
 def home():
     if request.method=="GET":
@@ -22,12 +23,12 @@ def redirect_login(uName, securityLevel):
     if securityLevel < service.maxSecurityLevel:
         #sent in GET => easily avoided => need POST
         return redirect(url_for("login", sl=securityLevel, name=uName))
-
     else:
         return redirect(url_for("denied"))
 
-
-@app.route("/login",methods=["GET","POST"])
+"""Login page
+    The user enter its credential according to the security level"""
+@app.route("/login", methods=["GET","POST"])
 def login():
     if request.method == "GET":
         if int(request.args['sl']) == 0:
@@ -46,14 +47,23 @@ def login():
     else:
         return redirect(url_for("home"))
 
-
+"""The user can check the information about an user using GET request"""
 @app.route('/logs', methods=["GET", "POST"])
 def checkLogs():
+    info = []
     if request.args:
         # retrieve the information asked
-        print "logs = ..."
-    return render_template("logs.html", failed=service.failedConnection)
+        if request.args["name"]:
+            info.append(request.args["name"])
+            for u in service.users:
+                if u.name == request.args['name']:
+                    info.append(u.browserUsed)
+                    info.append(u.IPAddressUsed)
+        print "logs = ", info
+    return render_template("logs.html", failed=service.failedConnection, data=info)
 
+"""Denied route
+    If a step in the login is wrong the user is redirected here"""
 @app.route('/denied', methods=["GET", "POST"])
 def denied():
     if request.method=="GET":
@@ -62,4 +72,4 @@ def denied():
         return redirect(url_for("home"))
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0')

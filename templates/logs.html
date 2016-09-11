@@ -7,7 +7,13 @@
 <body>
 <h1>Logs check</h1>
 <p>Here you can check the logs of the past connections</p>
-<p>Well it's still todo but soon</p>
 <p>So far {{failed}} connection failed </p>
+
+<p>Write the information you are interested to by using the URL. For example write :
+    <a href="http://0.0.0.0:5000/logs?name=azer">http://0.0.0.0:5000/logs?name=azer</a>
+</p>
+{%if data != []%}
+{{data}}
+{%endif%}
 </body>
 </html>

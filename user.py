@@ -1,6 +1,7 @@
 from datetime import datetime
 
-
+"""Class used to define an user
+    Could be represented in a DB"""
 class User:
     def __init__(self, name, pwd, pwd2):
         self.name = name
@@ -11,7 +12,7 @@ class User:
         self.IPAddressUsed=[]
         self.browserUsed=[]
 
-    """Method called for a new connection
+    """Methods called for a new connection
     Return True if the credential are correct False otherwise
     Add new entry in the connection recap"""
     def light_connection(self,name,pwd):
@@ -30,6 +31,8 @@ class User:
             self.connectionFailed.append(datetime.now)
             return False
 
+    """Once the credentials are verified
+        Call this method to add user_agent and remote_addr"""
     def add_connection(self,ip,browser):
         ipFound = False
         bFound = False
