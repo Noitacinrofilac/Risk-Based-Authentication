@@ -9,6 +9,6 @@ PoC of a Risk-Based authentication developed in Python.
 
 #### Tests coverage:
 authenticationService.py  100%
-main.py                    92%
-user.py                    91%
+main.py                    94%
+user.py                    97%
 

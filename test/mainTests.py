@@ -19,6 +19,8 @@ class MainTest(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
         result = self.app.get('/logs')
         self.assertEqual(result.status_code, 200)
+        result = self.app.get('/logs?name=test')
+        self.assertEqual(result.status_code, 200)
 
         #Login needs an id and a security level
         result = self.app.get('/login')

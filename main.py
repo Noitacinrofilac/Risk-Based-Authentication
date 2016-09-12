@@ -42,11 +42,11 @@ def login():
             print "[",datetime.now(),"][",request.method,"][",request.path,"] - User logged in successfully and redirected to /logs"
             return redirect(url_for("checkLogs"))
         else:
-            print "[",datetime.now(),"][",request.method,"][",request.path,"] - User failed to log in. Redirected to /home"
-            return redirect(url_for("home"))
+            print "[",datetime.now(),"][",request.method,"][",request.path,"] - User failed to log in. Redirected to /denied"
+            return redirect(url_for("denied"))
     else:
-        print "[",datetime.now(),"][",request.method,"][",request.path,"] - User tried to force system (method != GET or POST in /login) "
-        return redirect(url_for("home"))
+        print "[",datetime.now(),"][",request.method,"][",request.path,"] - User tried to force system (method != GET or POST in /login). Redirected to /denied "
+        return redirect(url_for("denied"))
 
 """The user can check the information about an user using GET request"""
 @app.route('/logs', methods=["GET", "POST"])
