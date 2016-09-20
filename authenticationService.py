@@ -4,6 +4,7 @@ class AuthenticationService:
     def __init__(self):
         self.maxSecurityLevel = 4
         self.failedConnection = 0
+        #Should be replaced by the db
         self.users = [User("azer", "azer","azer2"), User("hadrien", "h","h2")]
 
     """Represent the RiskEval service
@@ -14,8 +15,9 @@ class AuthenticationService:
         userKnown = False
         ipFound = False
         browserFound = False
-        # go trhough the registered users and check if user exists
-        # Then evaluate the risks
+        # Check if user exists and evaluate the risk
+        # Here we can add more security checks
+        # IPInternal / lastFailedLoginDate / ...
         for u in self.users:
             if u.name == uName:
                 userKnown = True
