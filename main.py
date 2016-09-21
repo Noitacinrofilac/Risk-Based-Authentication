@@ -57,10 +57,15 @@ def checkLogs():
         # retrieve the information asked
         if request.args["name"]:
             info.append(request.args["name"])
+            if request.args['name'] in service.users_dict:
+                u = service.users_dict[request.args['name']]
+                info.append(u.IPAddressUsed)
+                info.append(u.browserUsed)
+            """
             for u in service.users:
                 if u.name == request.args['name']:
                     info.append(u.browserUsed)
-                    info.append(u.IPAddressUsed)
+                    info.append(u.IPAddressUsed)"""
         print "[",datetime.now(),"][",request.method,"][",request.path,"] - User asks for information about ", request.args['name']
     return render_template("logs.html", failed=service.failedConnection, data=info)
 

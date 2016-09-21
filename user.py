@@ -15,17 +15,19 @@ class User:
     """Methods called for a new connection
     Return True if the credential are correct False otherwise
     Add new entry in the connection recap"""
-    def light_connection(self,name,pwd):
-        if self.name==name and self.pwd==pwd:
+    def light_connection(self,form,ipaddr,ua):
+        if self.name==form['name'] and self.pwd==form['pwd']:
             self.connectionSuccess.append(datetime.now)
+            self.add_connection(ipaddr, ua)
             return True
         else:
             self.connectionFailed.append(datetime.now)
             return False
 
-    def medium_connection(self,name,pwd,pwd2):
-        if self.name==name and self.pwd==pwd and self.pwd2==pwd2:
+    def medium_connection(self,form,ipaddr,ua):
+        if self.name==form['name'] and self.pwd==form['pwd'] and self.pwd2==form['pwd2']:
             self.connectionSuccess.append(datetime.now)
+            self.add_connection(ipaddr,ua)
             return True
         else:
             self.connectionFailed.append(datetime.now)
@@ -33,17 +35,9 @@ class User:
 
     """Once the credentials are verified
         Call this method to add user_agent and remote_addr"""
-    def add_connection(self,ip,browser):
-        ipFound = False
-        bFound = False
-        for v in self.IPAddressUsed:
-            if v == ip:
-                ipFound=True
-        if not ipFound:
+    def add_connection(self,ip,ua):
+        if not ip in self.IPAddressUsed:
             self.IPAddressUsed.append(ip)
+        if not ua in self.browserUsed:
+            self.browserUsed.append(ua)
 
-        for v in self.browserUsed:
-            if v == browser:
-                bFound=True
-        if not bFound:
-            self.browserUsed.append(str(browser))
