@@ -5,9 +5,8 @@
     <title>Login</title>
 </head>
 <body>
-<h1>Login as {{ param['name'] }} with security {{param['securityLevel']}}</h1>
+<h1>Login as {{ param['name'] }}</h1>
 <form method="post">
-    <input type="text" hidden value={{param['securityLevel']}} name="sl"/>
     Name
     <input type="text" name="name" value={{param['name']}} />
     Password

@@ -15,10 +15,8 @@ def home():
     else:
         securityLevel = service.eval_user_risk(request.form['name'],request.user_agent,request.remote_addr)
         if securityLevel < service.maxSecurityLevel:
-            # TODO
-            # sent in GET => easily avoided => need POST
             print "[",datetime.now(),"][",request.method,"][",request.path,"] - User redirected to /login with security level ",securityLevel
-            return redirect(url_for("login", sl=securityLevel, name=request.form["name"]))
+            return redirect(url_for("login", name=request.form["name"]))
         else:
             print "[",datetime.now(),"][",request.method,"][",request.path,"] - Unknown user tried to access /login. Redirected to /denied"
             return redirect(url_for("denied"))
@@ -28,16 +26,17 @@ def home():
 @app.route("/login", methods=["GET","POST"])
 def login():
     if request.method == "GET":
-        print "[", datetime.now(), "][", request.method, "][", request.path, "] - User on /login with security level = ",request.args['sl']
-        if int(request.args['sl']) == 0:
-            params = {"name":request.args['name'],"pwd2":"False","sms":"False","securityLevel":request.args['sl']}
-        elif int(request.args['sl']) == 1 or int(request.args['sl']) == 2:
-            params = {"name":request.args['name'], "pwd2":"True","sms":"False", "securityLevel":request.args['sl']}
+        print "[", datetime.now(), "][", request.method, "][", request.path, "] - User on /login with security level = ",service.users_security_level[request.args['name']]
+        if int(service.users_security_level[request.args['name']]) == 0:
+            params = {"name":request.args['name'],"pwd2":"False","sms":"False"}
+        elif int(service.users_security_level[request.args['name']]) == 1 or int(service.users_security_level[request.args['name']]) == 2:
+            params = {"name":request.args['name'], "pwd2":"True","sms":"False"}
         else:
-            params = {"name":request.args['name'], "pwd2":"True","sms":"True", "securityLevel":request.args['sl']}
+            params = {"name":request.args['name'], "pwd2":"True","sms":"True"}
         return render_template("login.html", param=params)
 
     elif request.method == "POST":
+        print "sl = ",service.users_security_level['azer']
         if service.authentication_service(request):
             print "[",datetime.now(),"][",request.method,"][",request.path,"] - User logged in successfully and redirected to /logs"
             return redirect(url_for("checkLogs"))
@@ -53,20 +52,19 @@ def login():
 def checkLogs():
     info = []
     print "[", datetime.now(), "][", request.method, "][", request.path, "] - User on /logs"
-    if request.args:
-        # retrieve the information asked
-        if request.args["name"]:
-            info.append(request.args["name"])
-            if request.args['name'] in service.users_dict:
-                u = service.users_dict[request.args['name']]
-                info.append(u.IPAddressUsed)
-                info.append(u.browserUsed)
-            """
-            for u in service.users:
-                if u.name == request.args['name']:
-                    info.append(u.browserUsed)
-                    info.append(u.IPAddressUsed)"""
+    if not request.args:
+        return render_template("logs.html", failed=service.failedConnection, data=info)
+
+    if request.args["name"]:
         print "[",datetime.now(),"][",request.method,"][",request.path,"] - User asks for information about ", request.args['name']
+        info.append(request.args["name"])
+        if request.args['name'] in service.users_dict:
+            u = service.users_dict[request.args['name']]
+            info.append(u.IPAddressUsed)
+            info.append(u.browserUsed)
+        else:
+            info.append("unknown")
+    #Here more request can be added
     return render_template("logs.html", failed=service.failedConnection, data=info)
 
 """Denied route

@@ -6,6 +6,7 @@ class AuthenticationService:
         self.failedConnection = 0
         #Should be replaced by the db
         self.users_dict = {"azer":User("azer", "azer","azer2"),"hadrien":User("hadrien", "h","h2")}
+        self.users_security_level = {"azer":self.maxSecurityLevel,"hadrien":self.maxSecurityLevel}
 
 
     """Represent the RiskEval service
@@ -18,10 +19,11 @@ class AuthenticationService:
         u = self.users_dict[uName]
         if not remote_addr in u.IPAddressUsed:
             securityLevel+=1
-        if not user_agent in u.browserUsed:
+        if not str(user_agent) in u.browserUsed:
             securityLevel+=1
         # Here we can add more security checks
         # IPInternal / lastFailedLoginDate / ...
+        self.users_security_level[uName] = securityLevel
         return securityLevel
 
 
@@ -29,16 +31,18 @@ class AuthenticationService:
     it checks using User class if the credential are correct
     it adds a new connection """
     def authentication_service(self, request):
-        if (not request.form['name'] in self.users_dict) or (int(request.form['sl']) >= self.maxSecurityLevel):
+        if (not request.form['name'] in self.users_dict) or (int(self.users_security_level[request.form['name']]) >= self.maxSecurityLevel):
             self.failedConnection += 1
             return False
         u = self.users_dict.get(request.form['name'])
-        if int(request.form['sl']) < 2:
+
+        if int(self.users_security_level[request.form['name']]) < 2:
             if not u.light_connection(request.form,request.remote_addr,request.user_agent):
                 self.failedConnection +=1
                 return False
-        elif int(request.form['sl']) < self.maxSecurityLevel:
+        elif int(self.users_security_level[request.form['name']]) < self.maxSecurityLevel:
             if not u.medium_connection(request.form, request.remote_addr, request.user_agent):
                 self.failedConnection += 1
                 return False
+
         return True

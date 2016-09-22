@@ -38,6 +38,6 @@ class User:
     def add_connection(self,ip,ua):
         if not ip in self.IPAddressUsed:
             self.IPAddressUsed.append(ip)
-        if not ua in self.browserUsed:
-            self.browserUsed.append(ua)
+        if not str(ua) in self.browserUsed:
+            self.browserUsed.append(str(ua))
 
